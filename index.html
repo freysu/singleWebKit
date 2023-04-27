@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+  
+  <head>
+    <title>时区转换器</title>
+    <meta charset="utf-8">
+    <style type="text/css">.container { margin: 20px auto; max-width: 800px; } h1 { text-align: center; } label, input, select { display: block; margin-bottom: 10px; font-size: 18px; } input[type="text"], select { padding: 5px; width: 100%; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box; font-size: 18px; } button { background-color: #2F67C9; color: #fff; padding: 10px 20px; border-radius: 5px; border: none; font-size: 18px; cursor: pointer; } button:hover { background-color: #274E9F; } .output { margin-top: 20px; font-size: 18px; } .output label{ font-weight: bold; } .result { margin: 10px 0; } .time-error, .zone-error { color: red; font-size: 16px; } .batch { margin-top: 50px; font-size: 18px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; background-color: #f9f9f9; } .batch label { font-weight: bold; margin-bottom: 5px; } .batch textarea { width: 100%; height: 200px; padding: 5px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 5px; resize: none; } .batch .batch-button { margin-top: 10px; text-align: center; } .batch button { background-color: #2F67C9; color: #fff; padding: 10px 20px; border-radius: 5px; border: none; font-size: 18px; cursor: pointer; } .batch button:hover { background-color: #274E9F; } .batch-result { margin-top: 20px; font-size: 18px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; background-color: #f9f9f9; } .batch-result .error-message { color: red; font-size: 16px; }</style>
+  </head>
+  
+  <body>
+    <div class="container">
+      <h1>时区转换器</h1>
+      <form id="timezone-form">
+        <div class="batch">
+            <h2>时区设置</h2>
+            <label for="input-timezone">输入时区</label>
+        <select id="input-timezone" name="input-timezone" required>
+          <option value="">请选择时区</option>
+          <option value="GMT" selected="selected">格林威治标准时间（GMT）</option>
+          <option value="UTC">协调世界时（UTC）</option>
+          <option value="ECT">欧洲中部时间（ECT）</option>
+          <option value="EET">东欧时间（EET）</option>
+          <option value="ART">埃及时间（ART）</option>
+          <option value="EAT">东部非洲时间（EAT）</option>
+          <option value="MET">中欧时间（MET）</option>
+          <option value="NET">中非洲时间（NET）</option>
+          <option value="PLT">巴基斯坦标准时间（PLT）</option>
+          <option value="IST">印度标准时间（IST）</option>
+          <option value="BST">孟加拉国标准时间（BST）</option>
+          <option value="VST">越南标准时间（VST）</option>
+          <option value="CTT">中国台湾时间（CTT）</option>
+          <option value="JST">日本标准时间（JST）</option>
+          <option value="ACT">澳大利亚中部时间（ACT）</option>
+          <option value="AET">澳大利亚东部时间（AET）</option>
+          <option value="SST">所罗门群岛时间（SST）</option>
+        </select>
+        <label for="output-timezone">输出时区</label>
+        <select id="output-timezone" name="output-timezone" required>
+          <option value="">请选择时区</option>
+          <option value="GMT">格林威治标准时间（GMT）</option>
+          <option value="UTC">协调世界时（UTC）</option>
+          <option value="ECT">欧洲中部时间（ECT）</option>
+          <option value="EET">东欧时间（EET）</option>
+          <option value="ART">埃及时间（ART）</option>
+          <option value="EAT">东部非洲时间（EAT）</option>
+          <option value="MET">中欧时间（MET）</option>
+          <option value="NET">中非洲时间（NET）</option>
+          <option value="PLT">巴基斯坦标准时间（PLT）</option>
+          <option value="IST">印度标准时间（IST）</option>
+          <option value="BST">孟加拉国标准时间（BST）</option>
+          <option value="VST">越南标准时间（VST）</option>
+          <option value="CTT" selected="selected">中国台湾时间（CTT）</option>
+          <option value="JST">日本标准时间（JST）</option>
+          <option value="ACT">澳大利亚中部时间（ACT）</option>
+          <option value="AET">澳大利亚东部时间（AET）</option>
+          <option value="SST">所罗门群岛时间（SST）</option>
+        </select>
+        </div>
+        <div class="batch">
+            <h2>转换时间格式</h2>
+            <label for="input-time">输入时间（YYYY-MM-DD HH:MM:SS）</label>
+            <input type="text" id="input-time" name="input-time" required>
+            <div class="time-error" id="time-error">
+            </div>
+            <div class="zone-error" id="zone-error">
+            </div>
+            <button id="getNowTimeButton">获取当前时间</button>
+            <button type="submit">转换</button>
+        </div>
+      </form>
+      <div class="output" id="output">
+      </div>
+      <div class="batch">
+        <h2>批量转换时间格式</h2>
+        <p>说明：每行一个时间</p>
+        <label for="batch-input">输入时间</label>
+        <textarea id="batch-input" name="batch-input">
+        </textarea>
+        <div class="batch-button">
+          <button id="batch-convert">转换</button>
+          <button id="batch-clear">清空</button>
+        </div>
+        <div class="batch-result" id="batch-output">
+        </div>
+      </div>
+    </div>
+    <script>// 定义时区映射
+      var zoneMap = {
+        'GMT': 0,
+        'UTC': 0,
+        'ECT': 1,
+        'EET': 2,
+        'ART': 2,
+        'EAT': 3,
+        'MET': 1,
+        'NET': 4,
+        'PLT': 5,
+        'IST': 5.5,
+        'BST': 6,
+        'VST': 7,
+        'CTT': 8,
+        'JST': 9,
+        'ACT': 9.5,
+        'AET': 10,
+        'SST': 11,
+      };
+
+      // 获取节点
+      var form = document.getElementById('timezone-form');
+      var inputTime = document.getElementById('input-time');
+      var inputTimezone = document.getElementById('input-timezone');
+      var outputTimezone = document.getElementById('output-timezone');
+      var output = document.getElementById('output');
+      var timeError = document.getElementById('time-error');
+      var zoneError = document.getElementById('zone-error');
+      var batchInput = document.getElementById('batch-input');
+      var batchConvert = document.getElementById('batch-convert');
+      var batchClear = document.getElementById("batch-clear")
+      var batchOutput = document.getElementById('batch-output');
+      var getNowTimeButton = document.getElementById('getNowTimeButton');
+
+      function getNowTime(){
+        // 获取当前时间
+        var now = new Date();
+        var year = now.getFullYear();
+        var month = now.getMonth() + 1;
+        month = month < 10 ? '0' + month : month;
+        var day = now.getDate();
+        day = day < 10 ? '0' + day : day;
+        var hour = now.getHours();
+        hour = hour < 10 ? '0' + hour : hour;
+        var minute = now.getMinutes();
+        minute = minute < 10 ? '0' + minute : minute;
+        var second = now.getSeconds();
+        second = second < 10 ? '0' + second : second;
+        var currentDatetime = year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second;
+        return currentDatetime
+      }
+
+      // 验证时间格式
+      function validateTimeFormat(time) {
+        var regEx = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
+        if (!time.match(regEx)) {
+          return false;
+        }
+        return true;
+      }
+
+      // 验证时区
+      function validateTimezone(zone) {
+        if (!zoneMap.hasOwnProperty(zone)) {
+          return false;
+        }
+        return true;
+      }
+
+      // 时间转换
+      function convertTime(time, inputZone, outputZone) {
+        var inputOffset = zoneMap[inputZone];
+        var outputOffset = zoneMap[outputZone];
+        var inputDate = new Date(time);
+        var inputUTC = Date.UTC(inputDate.getFullYear(), inputDate.getMonth(), inputDate.getDate(), inputDate.getHours(), inputDate.getMinutes(), inputDate.getSeconds());
+        var outputUTC = inputUTC + (outputOffset - inputOffset) * 60 * 60 * 1000;
+        var outputDate = new Date(outputUTC);
+        var outputTime = outputDate.toISOString().replace('T', ' ').replace('Z', '')
+        return outputTime;
+      }
+
+      // 表单提交事件
+      form.addEventListener('submit',
+      function(event) {
+        event.preventDefault();
+        var time = inputTime.value.trim();
+        var inputZone = inputTimezone.value.trim();
+        var outputZone = outputTimezone.value.trim();
+        if (!validateTimeFormat(time)) {
+          timeError.innerHTML = '时间格式不正确，请输入YYYY-MM-DD HH:MM:SS格式的时间。';
+          output.innerHTML = '';
+          return;
+        }
+        timeError.innerHTML = '';
+        if (!validateTimezone(inputZone)) {
+          zoneError.innerHTML = '输入时区不正确，请重新选择。';
+          output.innerHTML = '';
+          return;
+        }
+        zoneError.innerHTML = '';
+        if (!validateTimezone(outputZone)) {
+          zoneError.innerHTML = '输出时区不正确，请重新选择。';
+          output.innerHTML = '';
+          return;
+        }
+        zoneError.innerHTML = '';
+        var outputTime = convertTime(time, inputZone, outputZone);
+        output.innerHTML = '转换结果：' + outputTime.replace('.000',''); + '';
+      });
+
+      batchClear.addEventListener('click',function (){
+        batchInput.value = ''
+      })
+
+      // 批量转换事件
+      batchConvert.addEventListener('click',
+      function() {
+        batchInput.value = batchInput.value.replace('        ','');
+        var input = batchInput.value.trim()
+        var rows = input.split('\n');
+        var outputText = '';
+        var errorMessage = '';
+        rows.forEach(function(row, i) {
+          var cols = row.split(',');
+          var time = cols[0].trim();
+          var inputZone = inputTimezone.value.trim();
+          var outputZone = outputTimezone.value.trim();
+          if (!validateTimeFormat(time)) {
+            errorMessage = '第' + (i + 1) + '行时间格式不正确，请输入YYYY-MM-DD HH:MM:SS格式的时间。';
+            return;
+          }
+          if (!validateTimezone(inputZone)) {
+            errorMessage = '第' + (i + 1) + '行时区不正确，请重新输入。';
+            return;
+          }
+          outputText += convertTime(time, inputZone, outputZone).replace(".000","") + '\n';
+        });
+        if (errorMessage) {
+          batchOutput.innerHTML = '<div class="error-message">' + errorMessage + '</div>';
+        } else {
+          batchOutput.innerHTML = '<label>转换结果：</label><textarea class="result-box">' + outputText + '</textarea>';
+        }
+      });
+
+      getNowTimeButton.addEventListener('click',function(){
+        inputTime.value = getNowTime()
+        inputTimezone.value = 'CTT'
+      })
+  </script>
